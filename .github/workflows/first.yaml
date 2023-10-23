@@ -1,4 +1,4 @@
-name: scan
+name: build
 on:
   push:
     branches:
@@ -6,20 +6,24 @@ on:
   pull_request:
 jobs:
   build:
-    name: Build
-    runs-on: ubuntu-latest
+    name: scan1
+    runs-on: ubuntu-lateset
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Build an image from Dockerfile
-        run: |
-          docker build -t docker.io/my-organization/my-app:${{ github.sha }} -f C:\Users\lenovo\Desktop
-      - name: Run Trivy vulnerability scanner
+        uses: actions/checkout@v3
+
+      - name: Run Trivy vulnerability scanner in IaC mode
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'docker.io/my-organization/my-app:${{ github.sha }}'
-          format: 'table'
+          scan-type: 'config'
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
           exit-code: '1'
           ignore-unfixed: true
-          vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
