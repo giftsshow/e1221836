@@ -32,7 +32,7 @@ jobs:
     - name: upload to slack
       uses: MeilCli/slack-upload-file@v3
       with:
-        slack_token: xoxb-5065523607364-6032237051040-m5CzjzNYhE0cSKkUAawaEdUQ
+        slack_token: xoxb-5828957891927-5846920816146-MAMo5SZfdkgSEyjaONh4cVh9 
         content: 'file content'
         file_type: 'text'
         file_name: 'report.txt'
