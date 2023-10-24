@@ -32,7 +32,7 @@ jobs:
     - name: upload to slack
       uses: MeilCli/slack-upload-file@v3
       with:
-        slack_token: xoxb-5828957891927-5846920816146-MAMo5SZfdkgSEyjaONh4cVh9 
+        slack_token: xoxb-5828957891927-5846920816146-5dQH9p6n4UnQaHvN825dISuD
         content: 'file content'
         file_type: 'text'
         file_name: 'report.txt'
@@ -45,7 +45,7 @@ jobs:
     #     scan-type: 'fs'
     #     severity: 'CRITCAL'
 
-    
+
 
       # - name: Upload Trivy scan results to GitHub Security tab
       #   uses: github/codeql-action/upload-sarif@v2
