@@ -38,7 +38,7 @@ jobs:
         file_name: 'report.txt'
         title: 'failed scan'
         initial_comment: 'post by slack-upload-file'
-          # thread_ts: 'option'
+
     # - name: Run Trivy vulnerability scanner in IaC mode
     #   uses: aquasecurity/trivy-action@master
     #   with:
