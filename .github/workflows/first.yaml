@@ -38,7 +38,7 @@ jobs:
         file_name: 'report.txt'
         title: 'failed scan'
         initial_comment: 'post by slack-upload-file'
-
+        
     # - name: Run Trivy vulnerability scanner in IaC mode
     #   uses: aquasecurity/trivy-action@master
     #   with:
@@ -49,5 +49,5 @@ jobs:
       # - name: Upload Trivy scan results to GitHub Security tab
       #   uses: github/codeql-action/upload-sarif@v2
       #   with:
-      
+
       #     sarif_file: 'trivy-results.sarif'
