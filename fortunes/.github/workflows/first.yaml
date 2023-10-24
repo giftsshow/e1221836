@@ -5,25 +5,74 @@ on:
       - v0.0
   pull_request:
 jobs:
-  build:
-    name: scan1
-    runs-on: ubuntu-lateset
+  slackNotification:
+    name: Slack Notification
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_TITLE: "Image build and signed"
+        SLACK_MESSAGE: |
+          Name: gengyanrui
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
-      - name: Run Trivy vulnerability scanner in IaC mode
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'config'
-          hide-progress: false
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          exit-code: '1'
-          ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
+    - name: Run Trivy vulnerability scanner in IaC mode
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        severity: 'HIGH'
+        format: 'table'
+        output: 'report.txt'
+        exit: 1
+
+    - name: upload to slack
+      uses: MeilCli/slack-upload-file@v3
+      with:
+        slack_token: xoxb-5828957891927-5846920816146-5dQH9p6n4UnQaHvN825dISuD
+        content: 'file content'
+        file_type: 'text.txt'
+        file_name: 'report.txt'
+        title: 'failed scan'
+        initial_comment: 'post by slack-upload-file'
+
+    # - name: Run Trivy vulnerability scanner in IaC mode
+    #   uses: aquasecurity/trivy-action@master
+    #   with:
+    #     scan-type: 'fs'
+    #     severity: 'CRITCAL'
+
+
+
+      # - name: Upload Trivy scan results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+
+      #     sarif_file: 'trivy-results.sarif'
+
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          sarif_file: 'trivy-results.sarif'
+          username: gengyanrui
+          password: gyr520419
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./fortunes
+          push: true
+          tags: user/app:latest
