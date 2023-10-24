@@ -28,19 +28,19 @@ jobs:
         format: 'table'
         output: 'report.txt'
         exit: 1
-  jobs:
-  post:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: MeilCli/slack-upload-file@v3
-        with:
-          slack_token: ${{ secrets.SLACK_TOKEN }}
-          channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
-          content: 'file content'
-          file_type: 'text'
-          file_name: 'report.txt'
-          title: 'failed scan'
-          initial_comment: 'post by slack-upload-file'
+jobs:
+post:
+  runs-on: ubuntu-latest
+  steps:
+    - uses: MeilCli/slack-upload-file@v3
+      with:
+        slack_token: ${{ secrets.SLACK_TOKEN }}
+        channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
+        content: 'file content'
+        file_type: 'text'
+        file_name: 'report.txt'
+        title: 'failed scan'
+        initial_comment: 'post by slack-upload-file'
           # thread_ts: 'option'
     # - name: Run Trivy vulnerability scanner in IaC mode
     #   uses: aquasecurity/trivy-action@master
