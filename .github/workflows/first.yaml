@@ -34,7 +34,7 @@ jobs:
       with:
         slack_token: xoxb-5828957891927-5846920816146-5dQH9p6n4UnQaHvN825dISuD
         content: 'file content'
-        file_type: 'text'
+        file_type: 'text.txt'
         file_name: 'report.txt'
         title: 'failed scan'
         initial_comment: 'post by slack-upload-file'
