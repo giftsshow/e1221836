@@ -6,10 +6,10 @@ on:
   pull_request:
 jobs:
   build:
-    name: scan1
+    name: scan
     runs-on: ubuntu-lateset
     steps:
-    
+
       - name: Checkout code
         uses: actions/checkout@v3
 
