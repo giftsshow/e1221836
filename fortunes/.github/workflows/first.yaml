@@ -9,7 +9,6 @@ jobs:
     name: scan1
     runs-on: ubuntu-lateset
     steps:
-    
       - name: Checkout code
         uses: actions/checkout@v3
 
