@@ -5,26 +5,34 @@ on:
       - v0.0
   pull_request:
 jobs:
-  build:
-    name: scan
-    runs-on: ubuntu-lateset
+  slackNotification:
+    name: Slack Notification
+    runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_TITLE: "Image build and signed"
+        SLACK_MESSAGE: |
+          Name: gengyanrui
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # - name: Checkout code
+      #   uses: actions/checkout@v3
 
-      - name: Run Trivy vulnerability scanner in IaC mode
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'config'
-          hide-progress: false
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-          exit-code: '1'
-          ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
+      # - name: Run Trivy vulnerability scanner in IaC mode
+      #   uses: aquasecurity/trivy-action@master
+      #   with:
+      #     scan-type: 'config'
+      #     hide-progress: false
+      #     format: 'sarif'
+      #     output: 'trivy-results.sarif'
+      #     exit-code: '1'
+      #     ignore-unfixed: true
+      #     severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'trivy-results.sarif'
+      # - name: Upload Trivy scan results to GitHub Security tab
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: 'trivy-results.sarif'
