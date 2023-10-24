@@ -24,7 +24,17 @@ jobs:
       uses: aquasecurity/trivy-action@master
       with:
         scan-type: 'fs'
-        severity: 'CRITICAL'
+        severity: 'HIGH'
+        format: 'table'
+        output: 'report.txt'
+        exit: 1
+
+    # - name: Run Trivy vulnerability scanner in IaC mode
+    #   uses: aquasecurity/trivy-action@master
+    #   with:
+    #     scan-type: 'fs'
+    #     severity: 'CRITCAL'
+
 
       # - name: Upload Trivy scan results to GitHub Security tab
       #   uses: github/codeql-action/upload-sarif@v2
