@@ -111,7 +111,6 @@ jobs:
 
       - name: Slack Notification
         uses: rtCamp/action-slack-notify@v2
-        
         env:
           SLACK_TITLE: "Image build and signed"
           SLACK_MESSAGE: |
