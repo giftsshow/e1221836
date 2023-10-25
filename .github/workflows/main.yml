@@ -38,7 +38,7 @@ jobs:
         if: failure()
         with:
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          file_type: 'text.txt'
+          file_type: 'text'
           file_name: 'report.txt'
           title: 'failed scan'
           channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
