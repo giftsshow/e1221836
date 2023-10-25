@@ -10,9 +10,8 @@ jobs:
      if: startsWith(github.event.head_commit.message, '#NORUN') != true
      name: Slack Notification
      runs-on: ubuntu-latest
-     
-     steps:
 
+     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
