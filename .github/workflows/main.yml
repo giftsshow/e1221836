@@ -7,16 +7,17 @@ on:
 
 jobs:
   slackNotification:
+     if: startsWith(github.event.head_commit.message, '#NORUN') != true
      name: Slack Notification
      runs-on: ubuntu-latest
      steps:
-      - name: Check Commit Message
-        run: |
-          if [[ "${{ github.event.head_commit.message }}" == "#NORUN"* ]]; then
-            echo "Commit message starts with #NORUN, skipping the workflow."
-            exit 0
-          fi
-        shell: bash
+      # - name: Check Commit Message
+      #   run: |
+      #     if [[ "${{ github.event.head_commit.message }}" == "#NORUN"* ]]; 
+      #     then
+      #       exit 0
+      #     fi
+
       
       - name: Checkout code
         uses: actions/checkout@v3
@@ -124,5 +125,5 @@ jobs:
             Metriculation: A0286024H
             Email: e1221836@u.nus.edu
             Repository: https://github.com/${{ github.repository }}
-            Docker Hub URL: 
+            Docker Hub URL: https://hub.docker.com/repository/docker/gengyanrui/app/general
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
