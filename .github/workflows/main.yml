@@ -16,7 +16,7 @@ jobs:
             echo "Commit message starts with #NORUN, skipping the workflow."
             exit 0
           fi
-
+        shell: bash
       
       - name: Checkout code
         uses: actions/checkout@v3
