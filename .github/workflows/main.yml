@@ -41,6 +41,7 @@ jobs:
           file_type: 'text.txt'
           file_name: 'report.txt'
           title: 'failed scan'
+          channel_id: ${{ secrets.SLACK_CHANNEL_ID }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
