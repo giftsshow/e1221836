@@ -3,21 +3,14 @@ name: build
 on:
   push:
     branches:
-      - v0.0
-  pull_request:
+      - 'v[0-9]+.[0-9]+'
 
 jobs:
   slackNotification:
-    name: Slack Notification
-    runs-on: ubuntu-latest
-    steps:
-      - name: Slack Notification
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_TITLE: "Image build and signed"
-          SLACK_MESSAGE: |
-            Name: gengyanrui
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+     name: Slack Notification
+     runs-on: ubuntu-latest
+     steps:
+
       
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,20 +22,26 @@ jobs:
           severity: 'HIGH'
           format: 'table'
           output: 'report.txt'
-          exit: 1
+          exit-code: 1
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        if: failure()
+        env:
+          SLACK_TITLE: "scan failed"
+          SLACK_MESSAGE: "Failed trivy scan, see uploaded report"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: ${{ job.status }}
 
       - name: upload to slack
         uses: MeilCli/slack-upload-file@v3
+        if: failure()
         with:
           slack_token: ${{ secrets.SLACK_TOKEN }}
-          content: 'file content'
           file_type: 'text.txt'
           file_name: 'report.txt'
           title: 'failed scan'
 
-  docker:
-    runs-on: ubuntu-latest
-    steps:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -52,24 +51,20 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: gengyanrui
-          password: gyr520419
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
+          context: .
           push: true
-          tags: gengyanrui/app:latest
-
-  build-image:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3.5.2
-        with:
-          fetch-depth: 1
+          tags: gengyanrui/app:${{ github.event.head_commit }}
 
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.1.1
+        with:
+          cosign-release: 'v2.2.0'
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2.1.0
@@ -77,38 +72,50 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2.5.0
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2.1.0
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v2.1.0
+      #   with:
+      #     registry: ghcr.io
+      #     username: ${{ github.actor }}
+      #     password: ${{ secrets.GITHUB_TOKEN }}
 
-      - id: docker_meta
-        uses: docker/metadata-action@v4.4.0
-        with:
-          images: ghcr.io/sigstore/sample-honk
-          tags: type=sha,format=long
+      # - id: docker_meta
+      #   uses: docker/metadata-action@v4.4.0
+      #   with:
+      #     images: ghcr.io/sigstore/sample-honk
+      #     tags: type=sha,format=long
 
-      - name: Build and Push container images
-        uses: docker/build-push-action@v4.0.0
-        id: build-and-push
-        with:
-          platforms: linux/amd64,linux/arm/v7,linux/arm64
-          push: true
-          tags: ${{ steps.docker_meta.outputs.tags }}
+      # - name: Build and Push container images
+      #   uses: docker/build-push-action@v4.0.0
+      #   id: build-and-push
+      #   with:
+      #     platforms: linux/amd64,linux/arm/v7,linux/arm64
+      #     push: true
+      #     tags: ${{ steps.docker_meta.outputs.tags }}
 
       - name: Sign image with a key
         run: |
-          cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${TAGS}@${DIGEST}"
+          cosign sign --yes --key env://COSIGN_PRIVATE_KEY "${TAGS}"
         env:
-          TAGS: ${{ steps.docker_meta.outputs.tags }}
-          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_PRIVATE_KEY }}
+          TAGS: gengyanrui/app:${{ github.event.head_commit }}
+          COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_KEY }}
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
+          # DIGEST: ${{ steps.build-and-push.outputs.digest }}
 
-      - name: Sign the images with GitHub OIDC Token
+      # - name: Sign the images with GitHub OIDC Token
+      #   env:
+      #     DIGEST: ${{ steps.build-and-push.outputs.digest }}
+      #     TAGS: ${{ steps.docker_meta.outputs.tags }}
+      #   run: cosign sign --yes "${TAGS}@${DIGEST}"
+
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
         env:
-          DIGEST: ${{ steps.build-and-push.outputs.digest }}
-          TAGS: ${{ steps.docker_meta.outputs.tags }}
-        run: cosign sign --yes "${TAGS}@${DIGEST}"
+          SLACK_TITLE: "Image build and signed"
+          SLACK_MESSAGE: |
+            Name: gengyanrui
+            Metriculation: A0286024H
+            Email: e1221836@u.nus.edu
+            Repository: https://github.com/${{ github.repository }}
+            Docker Hub URL: 
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
